@@ -1,0 +1,72 @@
+{
+  "objects": [
+    {
+      "directoryPath": "#{myS3OutputLoc}",
+      "name": "S3OutputLocation",
+      "id": "S3OutputLocation",
+      "type": "S3DataNode"
+    },
+    {
+      "directoryPath": "#{myS3InputLoc}",
+      "name": "S3InputLocation",
+      "id": "S3InputLocation",
+      "type": "S3DataNode"
+    },
+    {
+      "output": {
+        "ref": "S3OutputLocation"
+      },
+      "input": {
+        "ref": "S3InputLocation"
+      },
+      "stage": "true",
+      "name": "ShellCommandActivityObj",
+      "id": "ShellCommandActivityObj",
+      "runsOn": {
+        "ref": "EC2ResourceObj"
+      },
+      "type": "ShellCommandActivity",
+      "command": "#{myShellCmd}"
+    },
+    {
+      "instanceType": "t1.micro",
+      "name": "EC2ResourceObj",
+      "id": "EC2ResourceObj",
+      "type": "Ec2Resource",
+      "terminateAfter": "20 Minutes"
+    },
+    {
+      "failureAndRerunMode": "CASCADE",
+      "resourceRole": "DataPipelineDefaultResourceRole",
+      "role": "DataPipelineDefaultRole",
+      "pipelineLogUri": "s3://bucket-name/logs/",
+      "scheduleType": "ONDEMAND",
+      "name": "Default",
+      "id": "Default"
+    }
+  ],
+  "parameters": [
+    {
+      "description": "S3 output folder",
+      "id": "myS3OutputLoc",
+      "type": "AWS::S3::ObjectKey"
+    },
+    {
+      "default": "s3://us-east-1.elasticmapreduce.samples/pig-apache-logs/data",
+      "description": "S3 input folder",
+      "id": "myS3InputLoc",
+      "type": "AWS::S3::ObjectKey"
+    },
+    {
+      "default": "grep -rc \"GET\" ${INPUT1_STAGING_DIR}/* > ${OUTPUT1_STAGING_DIR}/output.txt",
+      "description": "Shell command to run",
+      "id": "myShellCmd",
+      "type": "String"
+    }
+  ],
+  "values": {
+    "myShellCmd": "unzip -d ${OUTPUT1_STAGING_DIR} ${INPUT1_STAGING_DIR}/fileName.zip",
+    "myS3InputLoc": "s3://bucket-name/zip-file-path/",
+    "myS3OutputLoc": "s3://bucket-name/output-location-path/"
+  }
+}
